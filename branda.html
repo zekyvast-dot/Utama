@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Urban Motivator - Bangkit dari Keterbatasan, Menuju Kejayaan">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Urban Motivator">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>Urban Motivator - Bangkit dari Keterbatasan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+        }
+
+        /* Loading Screen */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .cyber-loader {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .cyber-ring {
+            position: absolute;
+            border: 3px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: cyberSpin 2s linear infinite;
+        }
+
+        .cyber-ring:nth-child(1) {
+            width: 150px;
+            height: 150px;
+            top: 0;
+            left: 0;
+            animation-duration: 2s;
+        }
+
+        .cyber-ring:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 15px;
+            left: 15px;
+            border-top-color: #888888;
+            animation-duration: 1.5s;
+            animation-direction: reverse;
+        }
+
+        .cyber-ring:nth-child(3) {
+            width: 90px;
+            height: 90px;
+            top: 30px;
+            left: 30px;
+            border-top-color: #ffffff;
+            animation-duration: 1s;
+        }
+
+        .cyber-core {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            top: 45px;
+            left: 45px;
+            background: radial-gradient(circle, #ffffff 0%, #888888 50%, #000000 100%);
+            border-radius: 50%;
+            animation: corePulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes cyberSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes corePulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 50px rgba(255, 255, 255, 0.8), 0 0 80px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .loader-text {
+            margin-top: 40px;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            animation: textFlicker 2s infinite;
+        }
+
+        @keyframes textFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .progress-container {
+            width: 200px;
+            height: 2px;
+            background: #333333;
+            margin-top: 20px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #ffffff;
+            width: 0%;
+            animation: loadingProgress 2.5s ease-out forwards;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* Install Prompt */
+        #install-prompt {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 30px;
+            z-index: 1000;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+        }
+
+        #install-prompt.show {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .install-text {
+            color: #ffffff;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .install-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .dismiss-btn {
+            background: transparent;
+            color: #888888;
+            border: 1px solid #888888;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dismiss-btn:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        /* Main Content */
+        #main-content {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 50px 20px;
+        }
+
+        .city-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #000000 0%, #0a0a0a 50%, #000000 100%);
+            z-index: -2;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 50px 160px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(2px 2px at 90px 40px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.6), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: twinkle 4s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .city-silhouette {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><path fill="%23050505" d="M0,400 L0,200 L30,200 L30,150 L60,150 L60,250 L90,250 L90,100 L120,100 L120,50 L150,50 L150,180 L180,180 L180,120 L210,120 L210,280 L240,280 L240,80 L270,80 L270,40 L300,40 L300,220 L330,220 L330,140 L360,140 L360,190 L390,190 L390,260 L420,260 L420,110 L450,110 L450,60 L480,60 L480,200 L510,200 L510,150 L540,150 L540,240 L570,240 L570,90 L600,90 L600,70 L630,70 L630,210 L660,210 L660,160 L690,160 L690,270 L720,270 L720,130 L750,130 L750,80 L780,80 L780,230 L810,230 L810,180 L840,180 L840,290 L870,290 L870,170 L900,170 L900,120 L930,120 L930,250 L960,250 L960,200 L990,200 L990,300 L1020,300 L1020,140 L1050,140 L1050,100 L1080,100 L1080,240 L1110,240 L1110,190 L1140,190 L1140,280 L1170,280 L1170,160 L1200,160 L1200,400 Z"/></svg>') repeat-x bottom;
+            background-size: 1200px 100%;
+            z-index: -1;
+            opacity: 0.95;
+        }
+
+        .city-lights {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: 
+                radial-gradient(circle at 3% 85%, rgba(255,255,255,0.9) 0px, transparent 4px),
+                radial-gradient(circle at 8% 75%, rgba(255,255,255,0.7) 0px, transparent 3px),
+                radial-gradient(circle at 13% 90%, rgba(255,255,255,0.8) 0px, transparent 4px),
+                radial-gradient(circle at 18% 80%, rgba(255,255,255,0.6) 0px, transparent 3px),
+                radial-gradient(circle at 23% 88%, rgba(255,255,255,0.9) 0px, transparent 4px),
+                radial-gradient(circle at 28% 78%, rgba(255,255,255,0.7) 0px, transparent 3px),
+                radial-gradient(circle at 33% 92%, rgba(255,255,255,0.8) 0px, transparent 4px),
+                radial-gradient(circle at 38% 82%, rgba(255,255,255,0.6) 0px, transparent 3px),
+                radial-gradient(circle at 43% 87%, rgba(255,255,255,0.9) 0px, transparent 4px),
+                radial-gradient(circle at 48% 77%, rgba(255,255,255,0.7) 0px, transparent 3px),
+                radial-gradient(circle at 53% 91%, rgba(255,255,255,0.8) 0px, transparent 4px),
+                radial-gradient(circle at 58% 81%, rgba(255,255,255,0.6) 0px, transparent 3px),
+                radial-gradient(circle at 63% 86%, rgba(255,255,255,0.9) 0px, transparent 4px),
+                radial-gradient(circle at 68% 76%, rgba(255,255,255,0.7) 0px, transparent 3px),
+                radial-gradient(circle at 73% 90%, rgba(255,255,255,0.8) 0px, transparent 4px),
+                radial-gradient(circle at 78% 80%, rgba(255,255,255,0.6) 0px, transparent 3px),
+                radial-gradient(circle at 83% 85%, rgba(255,255,255,0.9) 0px, transparent 4px),
+                radial-gradient(circle at 88% 75%, rgba(255,255,255,0.7) 0px, transparent 3px),
+                radial-gradient(circle at 93% 89%, rgba(255,255,255,0.8) 0px, transparent 4px),
+                radial-gradient(circle at 98% 79%, rgba(255,255,255,0.6) 0px, transparent 3px);
+            z-index: -1;
+            animation: lightsFlicker 2s ease-in-out infinite;
+        }
+
+        @keyframes lightsFlicker {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            animation: titleGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.1); }
+            50% { text-shadow: 0 0 40px rgba(255,255,255,0.6), 0 0 80px rgba(255,255,255,0.3), 0 0 120px rgba(255,255,255,0.1); }
+        }
+
+        .subtitle {
+            color: #666666;
+            font-size: 1.2rem;
+            margin-bottom: 60px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .quote-box {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px 50px;
+            margin-bottom: 60px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-box::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 120px;
+            color: rgba(255, 255, 255, 0.08);
+            font-family: serif;
+            line-height: 1;
+        }
+
+        .quote-text {
+            font-size: 1.6rem;
+            color: #ffffff;
+            line-height: 1.9;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.5px;
+        }
+
+        .quote-author {
+            margin-top: 25px;
+            color: #888888;
+            font-size: 1.1rem;
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            max-width: 900px;
+            margin: 0 auto 50px auto;
+        }
+
+        .buttons-grid a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 25px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            border-radius: 12px;
+            color: #ffffff;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buttons-grid a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .buttons-grid a:hover::before {
+            left: 100%;
+        }
+
+        .buttons-grid a:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.25), 0 0 60px rgba(255, 255, 255, 0.1);
+            border-color: #ffffff;
+        }
+
+        @media (max-width: 968px) {
+            .buttons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .title {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+            .quote-text {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .buttons-grid {
+                grid-template-columns: 1fr;
+            }
+            .title {
+                font-size: 1.8rem;
+                letter-spacing: 2px;
+            }
+            .quote-box {
+                padding: 30px 25px;
+            }
+            #install-prompt {
+                width: 95%;
+                padding: 15px 20px;
+            }
+        }
+
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="cyber-loader">
+            <div class="cyber-ring"></div>
+            <div class="cyber-ring"></div>
+            <div class="cyber-ring"></div>
+            <div class="cyber-core"></div>
+        </div>
+        <div class="loader-text">SYSTEM INITIALIZING</div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="install-prompt">
+        <p class="install-text">Install Urban Motivator ke Home Screen untuk akses cepat!</p>
+        <button class="install-btn" id="install-btn">INSTALL</button>
+        <button class="dismiss-btn" id="dismiss-btn">NANTI</button>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <div class="city-background"></div>
+        <div class="stars"></div>
+        <div class="city-silhouette"></div>
+        <div class="city-lights"></div>
+        
+        <div class="particle" style="left: 5%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 15%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 25%; animation-delay: 6s;"></div>
+        <div class="particle" style="left: 35%; animation-delay: 9s;"></div>
+        <div class="particle" style="left: 45%; animation-delay: 12s;"></div>
+        <div class="particle" style="left: 55%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 65%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 75%; animation-delay: 7s;"></div>
+        <div class="particle" style="left: 85%; animation-delay: 10s;"></div>
+        <div class="particle" style="left: 95%; animation-delay: 13s;"></div>
+
+        <div class="container">
+            <h1 class="title">URBAN MOTIVATOR</h1>
+            <p class="subtitle">Bangkit dari Keterbatasan, Menuju Kejayaan</p>
+            
+            <div class="quote-box">
+                <p class="quote-text">
+                    Kondisimu sekarang bukan penentu masa depanmu. Miskin, jelek, atau hancur hanyalah label sementara. Yang terpenting adalah tekadmu untuk bangkit. Setiap malam yang gelap akan berakhir dengan fajar. Ingat: berlian terbentuk dari tekanan, dan baja ditempa dari api. Kamu lebih kuat dari yang kamu kira.
+                </p>
+                <p class="quote-author">— Untuk Dirimu yang Luar Biasa</p>
+            </div>
+
+            <div class="buttons-grid">
+                <a href="son.html">son.html</a>
+                <a href="vision.html">vision.html</a>
+                <a href="goals.html">goals.html</a>
+                <a href="success.html">success.html</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Loading animation
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2800);
+        });
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installPrompt = document.getElementById('install-prompt');
+        const installBtn = document.getElementById('install-btn');
+        const dismissBtn = document.getElementById('dismiss-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                installPrompt.classList.add('show');
+            }, 3000);
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installPrompt.classList.remove('show');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        dismissBtn.addEventListener('click', () => {
+            installPrompt.classList.remove('show');
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then((registration) => {
+                console.log('Service Worker registered:', registration);
+            }).catch((error) => {
+                console.log('Service Worker registration failed:', error);
+            });
+        }
+
+        // Quotes rotation
+        const quotes = [
+            {
+                text: "Kondisimu sekarang bukan penentu masa depanmu. Miskin, jelek, atau hancur hanyalah label sementara. Yang terpenting adalah tekadmu untuk bangkit.",
+                author: "— Untuk Dirimu yang Luar Biasa"
+            },
+            {
+                text: "Overcoming poverty is not a task of charity, it is an act of justice. Like Slavery and Apartheid, poverty is not natural. It is man-made and it can be overcome.",
+                author: "— Nelson Mandela"
+            },
+            {
+                text: "Pain teaches you more than pleasure. Failure teaches you more than success. Poverty teaches you more than prosperity. Adversity teaches you more than comfort.",
+                author: "— Matshona Dhliwayo"
+            },
+            {
+                text: "The opposite of poverty is not wealth; the opposite of poverty is justice. You have the power to rewrite your story.",
+                author: "— Bryan Stevenson"
+            },
+            {
+                text: "Jangan biarkan keadaanmu sekarang mendefinisikan siapa kamu. Kamu adalah mimpi yang sedang menunggu untuk diwujudkan.",
+                author: "— Urban Motivator"
+            }
+        ];
+
+        let currentQuote = 0;
+        const quoteText = document.querySelector('.quote-text');
+        const quoteAuthor = document.querySelector('.quote-author');
+
+        setInterval(() => {
+            currentQuote = (currentQuote + 1) % quotes.length;
+            quoteText.style.opacity = '0';
+            quoteAuthor.style.opacity = '0';
+            
+            setTimeout(() => {
+                quoteText.textContent = quotes[currentQuote].text;
+                quoteAuthor.textContent = quotes[currentQuote].author;
+                quoteText.style.opacity = '1';
+                quoteAuthor.style.opacity = '1';
+            }, 500);
+        }, 8000);
+
+        quoteText.style.transition = 'opacity 0.5s ease';
+        quoteAuthor.style.transition = 'opacity 0.5s ease';
+    </script>
+</body>
+</html>
